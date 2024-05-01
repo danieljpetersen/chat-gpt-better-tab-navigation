@@ -53,7 +53,7 @@
                 btn.className = 'copy-text-btn';
                 btn.style.cssText = 'position: absolute; top: 0; right: 0; margin-top: -35px; padding: 4px 8px; border: 1px solid black; border-radius: 5px; background-color: #FFFFFF; cursor: pointer;';
                 btn.onclick = () => {
-                    navigator.clipboard.writeText(message.textContent.trim());
+                    navigator.clipboard.writeText(message.innerText.trim());
                     alert('Message copied to clipboard!');
                 };
 
