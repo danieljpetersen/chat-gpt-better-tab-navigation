@@ -16,31 +16,55 @@
 
             const promptTextarea = document.querySelector('#prompt-textarea');
             const copyCodeButtons = Array.from(document.querySelectorAll('button')).filter(button => button.textContent.includes('Copy code'));
+            const copyTextButtons = Array.from(document.querySelectorAll('.copy-text-btn'));
+            const allButtons = [...copyCodeButtons, ...copyTextButtons].sort((a, b) => {
+                const rectA = a.getBoundingClientRect();
+                const rectB = b.getBoundingClientRect();
+                return rectA.top - rectB.top;
+            });
 
             const focusedElement = document.activeElement;
-            const focusedIndex = copyCodeButtons.indexOf(focusedElement);
+            const focusedIndex = allButtons.indexOf(focusedElement);
 
             if (focusedElement === promptTextarea) {
-                // If focus is on the prompt, move to the last 'Copy code' button
-                if (copyCodeButtons.length > 0) {
-                    copyCodeButtons[copyCodeButtons.length - 1].focus();
+                if (allButtons.length > 0) {
+                    allButtons[allButtons.length - 1].focus();
                 }
-            } else if (copyCodeButtons.includes(focusedElement)) {
-                // If focus is on a 'Copy code' button
-                if (e.shiftKey && focusedIndex > 0) {
-                    // Move focus to the previous button if Shift+Tab
-                    copyCodeButtons[focusedIndex - 1].focus();
-                } else if (!e.shiftKey && focusedIndex === copyCodeButtons.length - 1) {
-                    // Move focus to the prompt if Tab on the last button
+            } else if (allButtons.includes(focusedElement)) {
+                let nextIndex = e.shiftKey ? focusedIndex - 1 : focusedIndex + 1;
+                if (nextIndex >= 0 && nextIndex < allButtons.length) {
+                    allButtons[nextIndex].focus();
+                } else if (!e.shiftKey && nextIndex >= allButtons.length) {
                     promptTextarea.focus();
-                } else if (!e.shiftKey) {
-                    // Move focus to the next button if Tab
-                    copyCodeButtons[focusedIndex + 1].focus();
+                } else if (e.shiftKey && focusedIndex === 0) {
+                    promptTextarea.focus();
                 }
-            } else {
-                // Default fallback if focus is elsewhere, focus the prompt
-                promptTextarea.focus();
             }
         }
     }, true);
+
+    function addCopyButtons() {
+        const messages = document.querySelectorAll('[data-message-author-role="assistant"]');
+
+        messages.forEach(message => {
+            if (!message.querySelector('.copy-text-btn')) {
+                let btn = document.createElement('button');
+                btn.textContent = 'Copy Text';
+                btn.className = 'copy-text-btn';
+                btn.style.cssText = 'position: absolute; top: 0; right: 0; margin-top: -35px; padding: 4px 8px; border: 1px solid black; border-radius: 5px; background-color: #FFFFFF; cursor: pointer;';
+                btn.onclick = () => {
+                    navigator.clipboard.writeText(message.textContent.trim());
+                    alert('Message copied to clipboard!');
+                };
+
+                if (message.firstChild) {
+                    message.insertBefore(btn, message.firstChild);
+                } else {
+                    message.appendChild(btn);
+                }
+            }
+        });
+    }
+
+    setInterval(addCopyButtons, 1000);
 })();
