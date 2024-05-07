@@ -4,6 +4,7 @@
 // @description  Enhances Tab navigation in ChatGPT interface
 // @author       Daniel J. Petersen
 // @match        https://chat.openai.com/*
+// @match        https://chatgpt.com/*
 // @grant        none
 // ==/UserScript==
 
